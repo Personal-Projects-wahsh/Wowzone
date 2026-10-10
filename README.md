@@ -7,13 +7,15 @@ self-contained HTML file. No build step, no dependencies, no backend.
 
 ## Views
 
-The tab bar in the header switches between three views of the same simulated data:
+The tab bar in the header switches between five views of the same simulated data:
 
 | View | What it shows |
 | --- | --- |
-| **Website** | The guest-facing side: browse activities, pick a room, request a slot |
-| **CR console** | The staff side: build proposals, load returning clients, send and confirm |
-| **Calendar** | Room-by-room schedule with setup and reset time, and conflict detection |
+| **Website** | The guest-facing side: browse experiences by activity or space, describe a group and get suggestions, pick a slot and pay a deposit |
+| **CR console** | The sales side: build a proposal, load a returning client, send it and confirm |
+| **Calendar** | Operational day view per room, with setup and cleaning buffers, blended-room bookings and conflict markers |
+| **Room operator** | On-the-day session screen: guest registration, check-in progress, staff needed and balance due |
+| **Admin** | Dashboard of peak-day staffing gaps against a load threshold, plus revenue by activity |
 
 ## Scope of the sample
 
