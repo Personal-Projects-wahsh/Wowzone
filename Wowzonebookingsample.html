@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WOW Zone booking sample</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1b1340; --soft:#5d5880; --line:#e6e2f3; --mist:#f6f4fc; --paper:#fff;
+  --violet:#6b3cf0; --magenta:#e23ccf; --blue:#2c7cff; --orange:#ff8a3d; --gold:#f2b63a; --teal:#12b8a6; --pink:#ff5c93;
+  --yellow:#f5c033; --green:#1fb573; --red:#ee4458;
+  --ring:conic-gradient(from 210deg,var(--blue),var(--violet),var(--magenta),var(--orange),var(--gold),var(--blue));
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.5 Outfit,system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2,h3{margin:0;line-height:1.15;font-weight:800;letter-spacing:-.01em}
+h1{font-size:clamp(30px,5vw,52px)} h2{font-size:24px} h3{font-size:17px;font-weight:600}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+.muted{color:var(--soft)} .small{font-size:14px} .right{text-align:right}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.sp{justify-content:space-between}
+.stack>*+*{margin-top:16px}
+
+/* wordmark: the ring is the brand's O */
+.mark{display:inline-flex;align-items:center;gap:3px;font-weight:800;font-size:26px;letter-spacing:.02em}
+.o{width:.92em;height:.92em;border-radius:50%;background:var(--ring);display:inline-block;position:relative}
+.o::after{content:"";position:absolute;inset:.17em;border-radius:50%;background:var(--paper)}
+.mark small{font-size:11px;font-weight:600;letter-spacing:.42em;margin-left:8px;color:var(--soft)}
+
+header.top{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;gap:16px;padding-top:10px;padding-bottom:10px;flex-wrap:wrap}
+nav.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
+nav.tabs button{border:0;background:none;padding:8px 14px;border-radius:999px;font-weight:500;color:var(--soft)}
+nav.tabs button[aria-current=true]{background:var(--ink);color:#fff}
+nav.tabs .sep{width:1px;background:var(--line);margin:4px 6px}
+.demo{background:var(--mist);border-bottom:1px solid var(--line);font-size:13px;color:var(--soft);padding:6px 0}
+
+.btn{border:0;border-radius:999px;padding:11px 20px;font-weight:600;background:var(--ink);color:#fff}
+.btn.grad{background:linear-gradient(95deg,var(--violet),var(--magenta) 60%,var(--orange))}
+.btn.ghost{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+.btn.sm{padding:7px 14px;font-size:14px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.field{display:grid;gap:4px;font-size:14px;font-weight:500}
+.field input,.field select,.field textarea,.inp{border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;min-width:0;width:100%;font-weight:400;font-size:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.panel{border:1.5px solid var(--line);border-radius:22px;padding:22px;background:#fff}
+.tint{background:var(--mist);border-color:transparent}
+section{padding:28px 0}
+
+/* website */
+.hero{padding:44px 0 20px;position:relative;overflow:hidden}
+.hero .big{position:absolute;right:-120px;top:-150px;width:520px;height:520px;border-radius:50%;background:var(--ring);opacity:.9;z-index:-1}
+.hero .big::after{content:"";position:absolute;inset:70px;border-radius:50%;background:#fff}
+.hero p{max-width:520px;margin-top:12px;font-size:18px;color:var(--soft)}
+.ai{margin-top:26px;max-width:640px;display:flex;gap:8px;background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:6px 6px 6px 18px;box-shadow:0 10px 30px -18px rgba(107,60,240,.55)}
+.ai input{flex:1;border:0;outline:0;min-width:0;background:none}
+.seg{display:inline-flex;background:var(--mist);border-radius:999px;padding:4px}
+.seg button{border:0;background:none;border-radius:999px;padding:8px 16px;font-weight:600;color:var(--soft)}
+.seg button[aria-pressed=true]{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(27,19,64,.15)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.card{border:1.5px solid var(--line);border-radius:22px;padding:18px;background:#fff;text-align:left;display:grid;gap:8px;align-content:start}
+button.card:hover{border-color:var(--ink)}
+.dot{width:44px;height:44px;border-radius:50%;border:7px solid var(--c,var(--violet));box-shadow:0 0 18px -2px var(--c,var(--violet))}
+.card .price{font-weight:600}
+.slots{display:flex;flex-wrap:wrap;gap:8px}
+.slot{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font-weight:500}
+.slot[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.slot:disabled{color:#b9b5cf;background:var(--mist);text-decoration:line-through;cursor:not-allowed}
+.sum{display:grid;gap:6px}
+.sum div{display:flex;justify-content:space-between;gap:12px}
+.sum .tot{font-weight:800;font-size:20px;border-top:1.5px solid var(--line);padding-top:8px;margin-top:4px}
+.qr{width:132px;height:132px;border:1.5px solid var(--line);border-radius:14px;padding:8px;background:#fff}
+
+/* status */
+.pill{display:inline-block;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600;background:var(--mist);white-space:nowrap}
+.pill.t{background:#fff3cf;color:#7a5800}.pill.g{background:#d8f6e7;color:#0b6b41}.pill.r{background:#ffdfe3;color:#a31226}.pill.b{background:#dfeaff;color:#124ab0}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{font-weight:600;text-align:left;color:var(--soft);font-size:13px;padding:8px 10px;border-bottom:1.5px solid var(--line);white-space:nowrap}
+td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+.scroll{overflow-x:auto}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.kpi{border-radius:18px;padding:16px;background:var(--mist)}
+.kpi b{display:block;font-size:28px;font-weight:800;line-height:1.1}
+
+/* builder */
+.item{border:1.5px solid var(--line);border-radius:16px;padding:14px;display:grid;gap:10px}
+.item .grid2{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.excl{font-size:13px;color:#a31226}
+.strip{display:flex;height:34px;border-radius:10px;overflow:hidden;background:var(--mist)}
+.strip span{display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;overflow:hidden;white-space:nowrap}
+
+/* calendar */
+.cal{min-width:860px}
+.hours{display:grid;margin-left:120px;font-size:12px;color:var(--soft)}
+.lane{display:flex;align-items:stretch;border-top:1px solid var(--line)}
+.lane .name{width:120px;flex:none;padding:14px 8px 14px 0;font-weight:600;font-size:14px}
+.lane .track{position:relative;flex:1;height:58px;background:repeating-linear-gradient(90deg,transparent 0 calc(100%/13 - 1px),var(--line) calc(100%/13 - 1px) calc(100%/13))}
+.blk{position:absolute;top:8px;bottom:8px;border:0;border-radius:9px;padding:2px 7px;font-size:12px;font-weight:600;text-align:left;overflow:hidden;white-space:nowrap;line-height:1.25;color:#fff}
+.blk.t{background:var(--yellow);color:#4a3600}.blk.g{background:var(--green);z-index:2}.blk.r{background:var(--red)}
+.blk.corp{box-shadow:inset 5px 0 0 var(--blue)}
+.buf{position:absolute;top:8px;bottom:8px;border-radius:9px;background:repeating-linear-gradient(135deg,#d9d5ea 0 4px,#efecf8 4px 8px)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--soft)}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:5px}
+
+/* drawer + toast */
+.shade{position:fixed;inset:0;background:rgba(27,19,64,.35);z-index:40;display:flex;justify-content:flex-end}
+.shade.center{justify-content:center;align-items:flex-start;overflow:auto;padding:24px 12px}
+.drawer{background:#fff;width:min(460px,100%);height:100%;overflow:auto;padding:24px}
+.sheet{background:#fff;width:min(620px,100%);border-radius:24px;padding:26px;border-top:8px solid transparent;border-image:linear-gradient(90deg,var(--blue),var(--violet),var(--magenta),var(--orange),var(--gold)) 1}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 20px;border-radius:999px;z-index:60;font-weight:500;max-width:92vw}
+.flag{background:#ffdfe3;color:#a31226;border-radius:12px;padding:10px 14px;font-weight:600}
+.bar{height:8px;border-radius:99px;background:var(--mist);overflow:hidden;min-width:90px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--violet),var(--magenta))}
+ul.terms{margin:0;padding-left:18px;color:var(--soft);font-size:14px}
+@media (max-width:640px){nav.tabs{margin-left:0}.hero .big{width:260px;height:260px;right:-150px;top:-150px;opacity:.35}.hero .big::after{inset:40px}}
+@media (prefers-reduced-motion:no-preference){.toast{animation:up .25s ease-out}@keyframes up{from{opacity:0;transform:translate(-50%,10px)}}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <span class="mark" aria-label="WOW Zone">W<span class="o"></span>W<small>ZONE</small></span>
+  <nav class="tabs" id="tabs" aria-label="Views"></nav>
+</div></header>
+<div class="demo"><div class="wrap">Sample build with placeholder rooms, capacities and prices. Payments are simulated and data resets on reload.</div></div>
+<main id="app"></main>
+<div id="over"></div>
+
+<script>
+/* ---------- master matrix (placeholder values until the client's matrix arrives) ---------- */
+const OPEN=600, CLOSE=1380, DEPOSIT=0.3;
+const R={
+  c1:{name:'Capsule 1',note:'50 sqm, one projected wall'},
+  c2:{name:'Capsule 2',note:'50 sqm, one projected wall'},
+  c3:{name:'Capsule 3',note:'Small groups up to 16'},
+  wl:{name:'WonderLab',note:'Creative room for parties'},
+  im:{name:'Immersive Room',note:'70 sqm, full projection',premium:1.2},
+  c12:{name:'Capsule 1 + 2',note:'Blended, 100 sqm',parts:['c1','c2']}
+};
+const BASE=['c1','c2','c3','wl','im'];
+const A={
+  vr:{name:'VR Games',c:'var(--violet)',dur:15,setup:5,reset:10,price:150,ops:1,rounds:true,self:true,rooms:{c12:10,c1:5,c2:5,c3:5},desc:'Multiplayer VR in rounds of 15 minutes.'},
+  karaoke:{name:'Karaoke',c:'var(--magenta)',dur:60,setup:10,reset:15,price:200,ops:1,self:true,rooms:{c1:8,c2:8,c12:15,im:25},desc:'Private karaoke room with projected visuals.'},
+  disco:{name:'Disco',c:'var(--blue)',dur:60,setup:10,reset:15,price:180,ops:1,self:true,rooms:{wl:30,im:35},desc:'Light, sound and a dance floor of your own.'},
+  dance:{name:'Dance Squad',c:'var(--orange)',dur:45,setup:10,reset:10,price:220,ops:2,self:true,rooms:{c1:20,c2:20,c12:40,im:35},desc:'Follow-the-screen dance battles for groups.'},
+  pict:{name:'Pictionary',c:'var(--teal)',dur:45,setup:5,reset:10,price:160,ops:1,self:true,rooms:{c1:12,c2:12,c3:12,wl:20},desc:'Digital painting and acting, team against team.'},
+  story:{name:'Storytelling',c:'var(--gold)',dur:30,setup:5,reset:10,price:120,ops:1,self:true,rooms:{c3:16,wl:30},desc:'Immersive stories for younger guests.'},
+  bday:{name:'Birthday Package',c:'var(--pink)',dur:90,setup:30,reset:30,price:350,ops:2,self:false,rooms:{c12:40,wl:30,c3:16},desc:'Cake room with 30 minutes of decoration time before you arrive.'}
+};
+const TERMS=['Children stay under the supervision of their guardians at all times.','The sequence of activities cannot be changed during the event.','A late arrival does not extend the session. It ends on time.','Only the cake may be brought from outside. Bring it at the start.','VR is not recommended for children under 13.','The booker is responsible for any damage to the space.','WOW Zone may take photos and video during the event.'];
+
+/* ---------- helpers ---------- */
+const T0=new Date();
+const pad=n=>String(n).padStart(2,'0');
+const d=n=>{const x=new Date(T0.getFullYear(),T0.getMonth(),T0.getDate()+n);return x.getFullYear()+'-'+pad(x.getMonth()+1)+'-'+pad(x.getDate())};
+const shift=(iso,n)=>{const x=new Date(iso+'T00:00');x.setDate(x.getDate()+n);return x.getFullYear()+'-'+pad(x.getMonth()+1)+'-'+pad(x.getDate())};
+const fmtD=iso=>new Date(iso+'T00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+const fmtT=m=>{const h=Math.floor(m/60),mm=m%60,ap=h>=12?'PM':'AM';return ((h+11)%12+1)+':'+pad(mm)+' '+ap};
+const money=n=>'EGP '+Math.round(n).toLocaleString('en-US');
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const parts=rid=>R[rid].parts||[rid];
+const LOCKED=['Pre-Booked','Confirmed','Completed'];
+const locked=b=>LOCKED.includes(b.status);
+const span=it=>[it.start-A[it.act].setup,it.start+it.dur+A[it.act].reset];
+
+/* ---------- scheduling engine ---------- */
+function mkItem(act,n,room,start){
+  const a=A[act],cap=a.rooms[room],rounds=a.rounds?Math.ceil(n/cap):1;
+  return {act,n,room,start,rounds,dur:a.dur*rounds,price:Math.round(a.price*n*(R[room].premium||1))};
+}
+// returns '' when free, 'busy' when a paid booking holds the room, 'own' when this same plan holds it
+function busy(rid,date,s,e,exId,extra){
+  const mine=parts(rid);
+  for(const b of S.bookings){
+    if(!locked(b)||b.date!==date||b.id===exId) continue;
+    for(const it of b.items){const [s2,e2]=span(it);if(s<e2&&s2<e&&parts(it.room).some(p=>mine.includes(p))) return 'busy';}
+  }
+  for(const x of (extra||[])) if(s<x.e&&x.s<e&&parts(x.room).some(p=>mine.includes(p))) return 'own';
+  return '';
+}
+function options(act,n,date,start,exId,extra){
+  const a=A[act];
+  return Object.keys(a.rooms).map(rid=>{
+    const cap=a.rooms[rid],rounds=a.rounds?Math.ceil(n/cap):1,dur=a.dur*rounds;
+    let reason='';
+    if(!a.rounds&&n>cap) reason='max capacity '+cap+', group is '+n;
+    else if(start!=null){
+      if(start+dur>CLOSE) reason='runs past closing time';
+      else{const w=busy(rid,date,start-a.setup,start+dur+a.reset,exId,extra);
+        if(w==='busy') reason='already booked at this time'; if(w==='own') reason='in use by another step of this booking';}
+    }
+    return {rid,cap,rounds,dur,price:Math.round(a.price*n*(R[rid].premium||1)),ok:!reason,reason};
+  }).sort((x,y)=>x.rounds-y.rounds||x.price-y.price);
+}
+const total=b=>b.items.reduce((t,it)=>t+it.price,0);
+const conflicted=b=>b.status==='Proposal Sent'&&b.items.some(it=>{const [s,e]=span(it);return busy(it.room,b.date,s,e,b.id)});
+const staffFor=it=>A[it.act].ops+Math.ceil(it.n/15);
+function dayStats(date){
+  const bs=S.bookings.filter(b=>b.date===date&&locked(b));
+  let mins=0,peak=0,peakT=OPEN;
+  bs.forEach(b=>b.items.forEach(it=>{const [s,e]=span(it);mins+=(e-s)*parts(it.room).length}));
+  for(let t=OPEN;t<CLOSE;t+=15){let n=0;bs.forEach(b=>b.items.forEach(it=>{if(it.start<=t&&t<it.start+it.dur)n+=staffFor(it)}));if(n>peak){peak=n;peakT=t}}
+  const dow=new Date(date+'T00:00').getDay(),rost=(dow===5||dow===6)?10:8;
+  return {n:bs.length,guests:bs.reduce((t,b)=>t+b.headcount,0),rev:bs.reduce((t,b)=>t+total(b),0),load:Math.round(100*mins/(BASE.length*(CLOSE-OPEN))),peak,peakT,rost};
+}
+
+/* ---------- state + seed data ---------- */
+let seq=10;
+const newId=p=>p+'-'+T0.getFullYear()+'-'+pad(++seq).padStart(5,'0');
+const S={view:'web',bookings:[],
+  web:{mode:'exp',step:'browse',act:null,room:null,n:6,date:d(1),time:null,pay:'deposit',name:'',phone:'',email:'',q:'',ai:null,last:null,co:'',dates:'',occ:''},
+  cr:{customer:'',type:'B2C group',date:d(3),start:960,items:[]},
+  cal:{date:d(0)}, op:{id:null,f:{name:'',phone:'',age:'',email:''}}, admin:{th:45}, drawer:null, proposal:null, ack:false};
+function add(o,items){
+  const b=Object.assign({id:newId(items.some(i=>i[0]==='bday')?'BD':'WZ'),type:'B2C group',source:'Website',paid:0,guests:[],note:''},o);
+  b.items=items.map(i=>mkItem(i[0],i[1],i[2],i[3]));
+  if(!b.headcount) b.headcount=Math.max(1,...b.items.map(i=>i.n));
+  if(b.status==='Confirmed'||b.status==='Completed') b.paid=total(b);
+  if(b.status==='Pre-Booked') b.paid=Math.round(total(b)*DEPOSIT);
+  S.bookings.push(b);return b;
+}
+function seed(){
+  const g=(name,phone,age,email,inn)=>({name,phone,age,email,in:inn});
+  const k=add({customer:'Salma Hassan',date:d(0),status:'Confirmed'},[['karaoke',12,'c12',1080]]);
+  k.guests=[g('Salma Hassan','0100 555 0141','18 to 25','salma@example.com',true),g('Omar Fathy','0111 555 0163','18 to 25','omar@example.com',true),g('Layla Samir','0122 555 0118','18 to 25','layla@example.com',true),g('Youssef Nabil','0100 555 0177','26 to 35','youssef@example.com',false),g('Hana Magdy','0155 555 0102','18 to 25','hana@example.com',false)];
+  add({customer:'Karim Adel',date:d(0),status:'Pre-Booked'},[['vr',5,'c3',900]]);
+  add({customer:'Orbit Tech',type:'B2B corporate',source:'CR',date:d(0),status:'Confirmed'},[['dance',30,'im',720],['karaoke',25,'im',800]]);
+  add({customer:'Dina Mostafa',source:'CR',date:d(2),status:'Confirmed'},[['bday',18,'wl',780]]);
+  add({customer:'Tarek Younes',date:d(2),status:'Confirmed'},[['karaoke',15,'c12',840]]);
+  add({customer:'Farida Emad',date:d(2),status:'Confirmed'},[['vr',5,'c3',840]]);
+  add({customer:'Nile School',type:'B2B school',source:'CR',date:d(2),status:'Confirmed'},[['dance',30,'im',840]]);
+  add({customer:'Ahmed Zaki',date:d(2),status:'Pre-Booked'},[['disco',28,'wl',1020]]);
+  add({customer:'Mariam Sherif',date:d(2),status:'Confirmed'},[['pict',12,'c3',960]]);
+  add({customer:'Nour Adel',source:'CR',date:d(3),status:'Proposal Sent'},[['karaoke',15,'c12',990]]);
+  S.bookings.push({id:newId('WZ'),customer:'Mona Khalil',type:'B2C group',source:'Phone',date:d(6),status:'Inquiry',items:[],paid:0,guests:[],headcount:10,note:'Asked about Ladies Night'});
+  S.op.id=k.id;
+}
+
+/* ---------- small renderers ---------- */
+function pill(b){
+  if(conflicted(b)) return '<span class="pill r">Conflict</span>';
+  const c=b.status==='Proposal Sent'?'t':locked(b)?'g':b.status==='Cancelled'?'r':'';
+  return '<span class="pill '+c+'">'+b.status+'</span>'+(b.type.startsWith('B2B')?' <span class="pill b">'+(b.type==='B2B school'?'School':'Corporate')+'</span>':'');
+}
+function qr(id){
+  let h=0;for(const ch of id)h=(h*31+ch.charCodeAt(0))>>>0;const N=21;let out='';
+  const fin=(x,y)=>(x<7&&y<7)||(x>N-8&&y<7)||(x<7&&y>N-8);
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){let on;
+    if(fin(x,y)){const fx=x<7?x:x-(N-7),fy=y<7?y:y-(N-7);on=fx===0||fx===6||fy===0||fy===6||(fx>1&&fx<5&&fy>1&&fy<5)}
+    else{h=(h*1103515245+12345)>>>0;on=(h>>16)&1}
+    if(on)out+='<rect x="'+x+'" y="'+y+'" width="1" height="1"/>'}
+  return '<svg class="qr" viewBox="0 0 21 21" role="img" aria-label="Sample QR code" fill="#1b1340">'+out+'</svg>';
+}
+function seqTable(b){
+  return '<div class="scroll"><table><tr><th>Time</th><th>Activity</th><th>Room</th><th>Guests</th><th class="right">Price</th></tr>'+
+  b.items.map(it=>'<tr><td>'+fmtT(it.start)+' to '+fmtT(it.start+it.dur)+'</td><td>'+A[it.act].name+(it.rounds>1?' <span class="muted">('+it.rounds+' rounds)</span>':'')+'</td><td>'+R[it.room].name+'</td><td>'+it.n+'</td><td class="right">'+money(it.price)+'</td></tr>').join('')+'</table></div>';
+}
+let toastT;
+function toast(m){const o=document.querySelector('.toast');if(o)o.remove();const t=document.createElement('div');t.className='toast';t.setAttribute('role','status');t.textContent=m;document.body.appendChild(t);clearTimeout(toastT);toastT=setTimeout(()=>t.remove(),3600)}
+
+/* ---------- view: website ---------- */
+function webSlots(){
+  const w=S.web,out=[];if(!w.act)return out;
+  const last=CLOSE-A[w.act].dur;
+  for(let t=OPEN;t<=last;t+=30){const o=options(w.act,w.n,w.date,t).filter(x=>x.ok&&(!w.room||x.rid===w.room));out.push({t,o:o[0]})}
+  return out;
+}
+function suggest(text){
+  const q=text.toLowerCase(),m=q.match(/\d+/),n=m?Math.max(1,Math.min(60,+m[0])):6,sc={};
+  const bump=(re,pts)=>{if(re.test(q))for(const k in pts)sc[k]=(sc[k]||0)+pts[k]};
+  bump(/kid|child|birthday|son|daughter/,{bday:3,story:2,pict:2,vr:1});
+  bump(/team|corporate|company|colleague|work/,{dance:2,karaoke:2,pict:3});
+  bump(/sing|karaoke|music/,{karaoke:4});
+  bump(/danc|party|friends|night/,{disco:2,dance:2,karaoke:1});
+  bump(/game|vr|play/,{vr:3,pict:1});
+  const fit=Object.keys(A).filter(k=>options(k,n).some(o=>o.ok));
+  return {n,list:fit.sort((a,b)=>(sc[b]||0)-(sc[a]||0)).slice(0,3).map(k=>{const o=options(k,n).find(x=>x.ok);return {k,o}})};
+}
+function vWeb(){
+  const w=S.web;
+  if(w.step==='done'){const b=w.last;return `<section><div class="wrap"><div class="panel stack" style="max-width:640px">
+    <h2>Booking ${b.status==='Confirmed'?'confirmed':'pre-booked'}</h2>
+    <p class="muted">${esc(b.customer)}, your slot is locked. Show this code at the desk.</p>
+    <div class="row">${qr(b.id)}<div><b>${b.id}</b><br>${fmtD(b.date)}<br>${A[b.items[0].act].name}, ${R[b.items[0].room].name}<br>${fmtT(b.items[0].start)}, ${b.headcount} guests</div></div>
+    <div class="sum"><div><span>Paid now</span><span>${money(b.paid)}</span></div><div><span>Due at the venue</span><span>${money(total(b)-b.paid)}</span></div></div>
+    <p class="small muted">On arrival, each guest fills in name, phone, age group and email to join the guest list and collect stickers.</p>
+    <div class="row"><button class="btn" data-a="webReset">Book another</button><button class="btn ghost" data-a="go" data-v="cal" data-date="${b.date}">See it on the calendar</button></div>
+  </div></div></section>`}
+  if(w.step==='inquiry') return `<section><div class="wrap"><div class="panel stack" style="max-width:640px">
+    <h2>${w.act==='bday'?'Plan a birthday with our team':'Corporate and school inquiry'}</h2>
+    <p class="muted">Tell us the basics. Our team builds a tailored proposal and sends you a link to approve and pay.</p>
+    <div class="grid2">
+      <label class="field">${w.act==='bday'?'Your name':'Company or school'}<input data-b="web.co" value="${esc(w.co)}"></label>
+      <label class="field">Phone<input data-b="web.phone" value="${esc(w.phone)}" inputmode="tel"></label>
+      <label class="field">Email<input data-b="web.email" value="${esc(w.email)}" type="email"></label>
+      <label class="field">Number of guests<input data-b="web.n" type="number" min="1" value="${w.n}"></label>
+      <label class="field">Preferred dates<input data-b="web.dates" value="${esc(w.dates)}"></label>
+      <label class="field">Occasion<input data-b="web.occ" value="${esc(w.occ)}"></label>
+    </div>
+    <div class="row"><button class="btn grad" data-a="sendInquiry">Send inquiry</button><button class="btn ghost" data-a="webReset">Back</button></div>
+  </div></div></section>`;
+  if(w.step==='book'){
+    const a=A[w.act],slots=webSlots(),pick=slots.find(s=>s.t===w.time&&s.o),o=pick&&pick.o;
+    const dep=o?Math.round(o.price*DEPOSIT):0,ready=o&&w.name.trim()&&w.phone.trim();
+    return `<section><div class="wrap stack">
+    <button class="btn ghost sm" data-a="webReset">Back to all experiences</button>
+    <div class="row"><span class="dot" style="--c:${a.c}"></span><div><h2>${a.name}${w.room?' in '+R[w.room].name:''}</h2><p class="muted">${a.desc}</p></div></div>
+    <div class="panel stack">
+      <div class="grid2">
+        <label class="field">Date<input type="date" data-b="web.date" data-r min="${d(0)}" value="${w.date}"></label>
+        <label class="field">Number of guests<input type="number" min="1" max="60" data-b="web.n" data-r value="${w.n}"></label>
+      </div>
+      <div><h3>Pick a start time</h3><p class="small muted">Times that are taken or do not fit your group are crossed out.</p></div>
+      <div class="slots">${slots.map(s=>`<button class="slot" data-a="webTime" data-t="${s.t}" aria-pressed="${w.time===s.t&&!!s.o}" ${s.o?'':'disabled'}>${fmtT(s.t)}</button>`).join('')||'<span class="muted">No rooms fit this group size.</span>'}</div>
+      ${slots.length&&!slots.some(s=>s.o)?'<p class="flag">No free slot for '+w.n+' guests on this date. Try another date or a smaller group.</p>':''}
+    </div>
+    ${o?`<div class="panel stack">
+      <h3>Your details</h3>
+      <div class="grid2">
+        <label class="field">Name<input data-b="web.name" data-k value="${esc(w.name)}" autocomplete="name"></label>
+        <label class="field">Phone<input data-b="web.phone" data-k value="${esc(w.phone)}" inputmode="tel"></label>
+        <label class="field">Email<input data-b="web.email" value="${esc(w.email)}" type="email"></label>
+      </div>
+      <div class="sum">
+        <div><span>${a.name}, ${w.n} guests${o.rounds>1?', '+o.rounds+' rounds':''}</span><span>${money(o.price)}</span></div>
+        <div><span>${R[o.rid].name}, ${fmtD(w.date)}</span><span>${fmtT(w.time)} to ${fmtT(w.time+o.dur)}</span></div>
+        <div class="tot"><span>Total</span><span>${money(o.price)}</span></div>
+      </div>
+      <div class="seg" role="group" aria-label="Payment">
+        <button data-a="webPay" data-p="deposit" aria-pressed="${w.pay==='deposit'}">Pay deposit ${money(dep)}</button>
+        <button data-a="webPay" data-p="full" aria-pressed="${w.pay==='full'}">Pay in full ${money(o.price)}</button>
+      </div>
+      <div><button class="btn grad" id="payBtn" data-a="webConfirm" ${ready?'':'disabled'}>Pay ${money(w.pay==='full'?o.price:dep)} and book</button>
+      <p class="small muted" style="margin-top:8px">Guest details are not needed now. Everyone registers on arrival.</p></div>
+    </div>`:''}
+    </div></section>`;
+  }
+  const acts=Object.keys(A).filter(k=>!w.room||A[k].rooms[w.room]);
+  return `<section class="hero"><div class="wrap"><div class="big"></div>
+    <h1>Pick an experience.<br>We hold the room.</h1>
+    <p>Book VR, karaoke, disco and more at WOW Zone. Choose a time, pay online, and bring your people.</p>
+    <form class="ai" data-form="ai"><input data-b="web.q" value="${esc(w.q)}" placeholder="Describe your group, e.g. 12 friends who love to sing" aria-label="Describe your group"><button class="btn grad">Suggest</button></form>
+    ${w.ai?`<div class="stack" style="margin-top:18px"><p class="small muted">Suggestions for ${w.ai.n} guests. Demo logic stands in for the AI assistant and only proposes what the matrix allows.</p>
+      <div class="cards">${w.ai.list.map(s=>`<button class="card" data-a="webPick" data-k="${s.k}" data-n="${w.ai.n}"><span class="dot" style="--c:${A[s.k].c}"></span><h3>${A[s.k].name}</h3><span class="muted small">${R[s.o.rid].name}, ${s.o.dur} min${s.o.rounds>1?' in '+s.o.rounds+' rounds':''}</span><span class="price">${money(s.o.price)} for ${w.ai.n}</span></button>`).join('')}</div></div>`:''}
+  </div></section>
+  <section><div class="wrap stack">
+    <div class="row sp"><h2>${w.room?'What to do in '+R[w.room].name:'Experiences'}</h2>
+      <div class="seg" role="group" aria-label="Browse by"><button data-a="webMode" data-m="exp" aria-pressed="${w.mode==='exp'}">By experience</button><button data-a="webMode" data-m="space" aria-pressed="${w.mode==='space'}">By space</button></div></div>
+    ${w.mode==='space'&&!w.room?`<div class="cards">${Object.keys(R).map(r=>`<button class="card" data-a="webRoom" data-r="${r}"><h3>${R[r].name}</h3><span class="muted small">${R[r].note}</span><span class="small">${Object.keys(A).filter(k=>A[k].rooms[r]).map(k=>A[k].name).join(', ')}</span></button>`).join('')}</div>`
+    :`${w.room?'<button class="btn ghost sm" data-a="webRoom" data-r="">Choose another space</button>':''}<div class="cards">${acts.map(k=>{const a=A[k];return `<button class="card" data-a="webPick" data-k="${k}"><span class="dot" style="--c:${a.c}"></span><h3>${a.name}</h3><span class="muted small">${a.desc}</span><span class="small">${a.dur} min, up to ${Math.max(...Object.values(a.rooms))} guests</span><span class="price">${a.self?'From '+money(a.price)+' per guest':'Planned with our team'}</span></button>`}).join('')}</div>`}
+    <div class="panel tint row sp"><div><h3>Corporate day or school trip?</h3><p class="muted">Send an inquiry and our team builds the programme with you.</p></div><button class="btn" data-a="webInquiry">Send an inquiry</button></div>
+  </div></section>`;
+}
+
+/* ---------- view: CR console ---------- */
+function crPlan(){
+  const c=S.cr,extra=[];let t=c.start;
+  return c.items.map((it,i)=>{
+    const a=A[it.act],opts=options(it.act,it.n,c.date,t,null,extra),ok=opts.filter(o=>o.ok).slice(0,3);
+    const ch=ok.find(o=>o.rid===it.room)||ok[0]||null,r={i,act:it.act,n:it.n,start:t,opts,ok,ch};
+    if(ch) extra.push({room:ch.rid,s:t-a.setup,e:t+ch.dur+a.reset});
+    t+=(ch?ch.dur:a.dur)+10;return r;
+  });
+}
+function vCR(){
+  const c=S.cr,plan=crPlan(),tot=plan.reduce((s,p)=>s+(p.ch?p.ch.price:0),0),valid=plan.length&&plan.every(p=>p.ch)&&c.customer.trim();
+  const all=S.bookings.slice().sort((a,b)=>a.date.localeCompare(b.date)),cnt=s=>all.filter(b=>b.status===s).length;
+  const lk=all.filter(locked).length,pipe=all.filter(b=>b.status!=='Inquiry').length;
+  const times=[];for(let t=OPEN;t<=CLOSE-60;t+=30)times.push(t);
+  return `<section><div class="wrap stack">
+  <div class="row sp"><h2>Customer Relations console</h2><span class="muted small">Every booking by status, and what needs a follow-up</span></div>
+  <div class="kpis"><div class="kpi"><b>${cnt('Inquiry')+cnt('Lead')}</b>Inquiries and leads</div><div class="kpi"><b>${cnt('Proposal Sent')}</b>Proposals awaiting payment</div><div class="kpi"><b>${lk}</b>Pre-booked and confirmed</div><div class="kpi"><b>${pipe?Math.round(100*lk/pipe):0}%</b>Conversion</div></div>
+  <div class="panel stack"><h3>Build a booking</h3>
+    <div class="grid2">
+      <label class="field">Client name<input data-b="cr.customer" data-k value="${esc(c.customer)}"></label>
+      <label class="field">Customer type<select data-b="cr.type">${['B2C individual','B2C group','B2B corporate','B2B school'].map(t=>`<option ${t===c.type?'selected':''}>${t}</option>`).join('')}</select></label>
+      <label class="field">Date<input type="date" data-b="cr.date" data-r min="${d(0)}" value="${c.date}"></label>
+      <label class="field">First activity starts<select data-b="cr.start" data-r data-num>${times.map(t=>`<option value="${t}" ${t===c.start?'selected':''}>${fmtT(t)}</option>`).join('')}</select></label>
+    </div>
+    <div class="row"><button class="btn sm" data-a="crTemplate">Use the birthday template</button><button class="btn ghost sm" data-a="crAdd">Add an activity</button>${c.items.length?'<button class="btn ghost sm" data-a="crClear">Clear</button>':''}</div>
+    ${plan.length?'':'<p class="muted">Start from the birthday template to see the client\'s own example: 20 kids, VR, the birthday package and Dance Squad with 10 parents.</p>'}
+    ${plan.map(p=>{const bad=p.opts.filter(o=>!o.ok);return `<div class="item">
+      <div class="row sp"><b>${fmtT(p.start)}${p.ch?' to '+fmtT(p.start+p.ch.dur):''}</b><span>${p.ch?money(p.ch.price):''} <button class="btn ghost sm" data-a="crDel" data-i="${p.i}" aria-label="Remove activity">Remove</button></span></div>
+      <div class="grid2">
+        <label class="field">Activity<select data-b="cr.items.${p.i}.act" data-r>${Object.keys(A).map(k=>`<option value="${k}" ${k===p.act?'selected':''}>${A[k].name}</option>`).join('')}</select></label>
+        <label class="field">Guests<input type="number" min="1" max="60" data-b="cr.items.${p.i}.n" data-r value="${p.n}"></label>
+        <label class="field">Room, up to 3 options${p.ok.length?`<select data-b="cr.items.${p.i}.room" data-r>${p.ok.map(o=>`<option value="${o.rid}" ${p.ch&&o.rid===p.ch.rid?'selected':''}>${R[o.rid].name}, ${money(o.price)}${o.rounds>1?', '+o.rounds+' rounds':''}</option>`).join('')}</select>`:'<span class="flag">No room fits</span>'}</label>
+      </div>
+      ${p.ch&&(A[p.act].setup>=20)?`<span class="small muted">Room is blocked from ${fmtT(p.start-A[p.act].setup)} for decoration and until ${fmtT(p.start+p.ch.dur+A[p.act].reset)} for cleaning.</span>`:''}
+      ${bad.length?'<span class="excl">Excluded: '+bad.map(o=>R[o.rid].name+' ('+o.reason+')').join('; ')+'</span>':''}
+    </div>`}).join('')}
+    ${plan.length?`<div class="strip" aria-hidden="true">${plan.map(p=>`<span style="flex:${p.ch?p.ch.dur:30};background:${A[p.act].c}">${A[p.act].name}</span>`).join('')}</div>
+    <div class="row sp"><span class="sum" style="min-width:220px"><span class="tot" style="display:flex;justify-content:space-between;border:0"><span>Total</span><span>${money(tot)}</span></span></span>
+    <span><button class="btn grad" id="sendBtn" data-a="crSend" ${valid?'':'disabled'}>Send proposal</button>${c.customer.trim()?'':' <span class="small muted">Add the client name first</span>'}</span></div>`:''}
+  </div>
+  <div class="panel"><h3>Pipeline</h3><div class="scroll"><table>
+    <tr><th>ID</th><th>Client</th><th>Date</th><th>Status</th><th>Source</th><th class="right">Total</th><th></th></tr>
+    ${all.map(b=>`<tr><td>${b.id}</td><td>${esc(b.customer)}${b.note?'<br><span class="muted small">'+esc(b.note)+'</span>':''}</td><td>${fmtD(b.date)}</td><td>${pill(b)}${conflicted(b)?'<br><span class="small" style="color:#a31226">Slot was paid for by another client. Offer an alternative.</span>':''}</td><td>${b.source}</td><td class="right">${b.items.length?money(total(b)):''}</td><td class="right"><button class="btn ghost sm" data-a="open" data-id="${b.id}">Open</button></td></tr>`).join('')}
+  </table></div></div>
+  </div></section>`;
+}
+
+/* ---------- view: calendar ---------- */
+function vCal(){
+  const date=S.cal.date,W=CLOSE-OPEN,pc=m=>(100*(m-OPEN)/W).toFixed(2)+'%',wd=m=>(100*m/W).toFixed(2)+'%';
+  const hrs=[];for(let h=10;h<23;h++)hrs.push(h);
+  const bs=S.bookings.filter(b=>b.date===date&&(locked(b)||b.status==='Proposal Sent'));
+  return `<section><div class="wrap stack">
+  <div class="row sp"><h2>Operational calendar</h2><div class="row"><button class="btn ghost sm" data-a="calShift" data-n="-1">Previous day</button><input class="inp" style="width:auto" type="date" data-b="cal.date" data-r value="${date}"><button class="btn ghost sm" data-a="calShift" data-n="1">Next day</button></div></div>
+  <div class="legend"><span><i style="background:var(--yellow)"></i>Proposal sent, not held</span><span><i style="background:var(--green)"></i>Deposit paid or confirmed</span><span><i style="background:var(--red)"></i>Conflict</span><span><i style="background:var(--blue)"></i>Corporate or school marker</span><span><i style="background:repeating-linear-gradient(135deg,#d9d5ea 0 4px,#efecf8 4px 8px)"></i>Setup and cleaning buffer</span></div>
+  <div class="panel scroll"><div class="cal">
+    <div class="hours" style="grid-template-columns:repeat(13,1fr)">${hrs.map(h=>'<span>'+fmtT(h*60).replace(':00','')+'</span>').join('')}</div>
+    ${BASE.map(r=>`<div class="lane"><div class="name">${R[r].name}</div><div class="track">${bs.map(b=>b.items.filter(it=>parts(it.room).includes(r)).map(it=>{const a=A[it.act],cls=conflicted(b)?'r':locked(b)?'g':'t';
+      return `<span class="buf" style="left:${pc(it.start-a.setup)};width:${wd(a.setup+it.dur+a.reset)}"></span><button class="blk ${cls}${b.type.startsWith('B2B')?' corp':''}" style="left:${pc(it.start)};width:${wd(it.dur)}" data-a="open" data-id="${b.id}" title="${a.name}, ${esc(b.customer)}, ${fmtT(it.start)}">${a.name}<br>${esc(b.customer)}</button>`}).join('')).join('')}</div></div>`).join('')}
+  </div></div>
+  ${bs.length?'':'<p class="muted">No bookings on '+fmtD(date)+'. Book one from the website or the CR console and it appears here.</p>'}
+  <p class="small muted">A blended booking such as Capsule 1 + 2 fills both capsule rows. Select a block to open its Experience record.</p>
+  </div></section>`;
+}
+
+/* ---------- view: room operator ---------- */
+function vOp(){
+  const today=d(0),list=S.bookings.filter(b=>locked(b)&&b.date>=today).sort((a,b)=>a.date.localeCompare(b.date)||a.items[0].start-b.items[0].start);
+  const b=S.bookings.find(x=>x.id===S.op.id)||list[0],f=S.op.f;
+  if(!b) return '<section><div class="wrap"><p class="muted">No paid sessions yet.</p></div></section>';
+  const full=b.guests.length>=b.headcount,inn=b.guests.filter(g=>g.in).length,due=total(b)-b.paid;
+  return `<section><div class="wrap stack">
+  <div class="row sp"><h2>Room operator</h2><label class="field" style="min-width:260px">Session<select data-b="op.id" data-r>${list.map(x=>`<option value="${x.id}" ${x.id===b.id?'selected':''}>${fmtD(x.date)}, ${fmtT(x.items[0].start)}, ${esc(x.customer)}</option>`).join('')}</select></label></div>
+  <div class="panel stack">
+    <div class="row sp"><div><h3>${esc(b.customer)} <span class="muted">${b.id}</span></h3><p class="muted">${b.items.map(it=>A[it.act].name+' in '+R[it.room].name+', '+fmtT(it.start)).join(' then ')}</p></div>${pill(b)}</div>
+    <div class="kpis"><div class="kpi"><b>${b.guests.length} of ${b.headcount}</b>Guests registered<div class="bar" style="margin-top:8px"><i style="width:${Math.min(100,100*b.guests.length/b.headcount)}%"></i></div></div><div class="kpi"><b>${inn}</b>Checked in</div><div class="kpi"><b>${Math.max(...b.items.map(staffFor))}</b>Staff needed</div><div class="kpi"><b>${money(due)}</b>Balance due</div></div>
+  </div>
+  <div class="panel stack">
+    <h3>Add a guest</h3><p class="small muted">Guests normally register on their own phone from the booking QR code. Use this form for anyone who has not.</p>
+    ${full?`<div class="flag">All ${b.headcount} booked places are registered. If more people arrived, add them to the booking first so the price and staffing update.</div>`:''}
+    <div class="grid2">
+      <label class="field">Name<input data-b="op.f.name" value="${esc(f.name)}" ${full?'disabled':''}></label>
+      <label class="field">Phone<input data-b="op.f.phone" value="${esc(f.phone)}" inputmode="tel" ${full?'disabled':''}></label>
+      <label class="field">Age group<select data-b="op.f.age" ${full?'disabled':''}>${['','Under 13','13 to 17','18 to 25','26 to 35','36 and over'].map(x=>`<option ${x===f.age?'selected':''}>${x}</option>`).join('')}</select></label>
+      <label class="field">Email<input data-b="op.f.email" value="${esc(f.email)}" type="email" ${full?'disabled':''}></label>
+    </div>
+    <div class="row"><button class="btn" data-a="opAdd" ${full?'disabled':''}>Add guest and check in</button><button class="btn ghost" data-a="opExtra">Add 1 extra guest to the booking</button></div>
+  </div>
+  <div class="panel"><h3>Guest list</h3>${b.guests.length?`<div class="scroll"><table><tr><th>Name</th><th>Phone</th><th>Age group</th><th>Email</th><th></th></tr>
+    ${b.guests.map((g,i)=>`<tr><td>${esc(g.name)}</td><td>${esc(g.phone)}</td><td>${esc(g.age)}</td><td>${esc(g.email)}</td><td class="right">${g.in?'<span class="pill g">Checked in</span>':`<button class="btn sm" data-a="opIn" data-i="${i}">Check in</button>`}</td></tr>`).join('')}</table></div>`:'<p class="muted">No guests registered yet. Add the first one above.</p>'}
+    <p class="small muted" style="margin-top:12px">${b.guests.length<b.headcount?(b.headcount-b.guests.length)+' guests still to register before check-in is complete.':'Check-in list is complete.'}</p></div>
+  </div></section>`;
+}
+
+/* ---------- view: admin ---------- */
+function vAdmin(){
+  const th=S.admin.th,t=dayStats(d(0)),wait=S.bookings.filter(b=>b.status==='Proposal Sent').length,days=[];
+  for(let i=0;i<7;i++){const date=d(i),s=dayStats(date);s.date=date;s.gap=Math.max(0,s.peak-s.rost);s.flag=s.gap>0||s.load>=th;days.push(s)}
+  const flags=days.filter(x=>x.flag),rev={};
+  S.bookings.filter(locked).forEach(b=>b.items.forEach(it=>rev[it.act]=(rev[it.act]||0)+it.price));
+  const mx=Math.max(1,...Object.values(rev));
+  return `<section><div class="wrap stack">
+  <h2>Admin dashboard</h2>
+  ${flags.map(x=>`<div class="flag row sp"><span>Peak day ${fmtD(x.date)}: ${x.gap>0?'call '+x.gap+' extra ushers or operators. Peak need is '+x.peak+' at '+fmtT(x.peakT)+', '+x.rost+' rostered.':'room load is '+x.load+'%, above your '+th+'% threshold. Staffing is covered.'}</span><button class="btn sm" data-a="go" data-v="cal" data-date="${x.date}">Open day</button></div>`).join('')}
+  <div class="kpis"><div class="kpi"><b>${t.n}</b>Bookings today</div><div class="kpi"><b>${t.guests}</b>Guests expected today</div><div class="kpi"><b>${money(t.rev)}</b>Booked revenue today</div><div class="kpi"><b>${wait}</b>Proposals awaiting deposit</div></div>
+  <div class="panel stack"><div class="row sp"><h3>Next 7 days: load and staffing</h3><label class="field" style="min-width:230px">Flag a day when room load reaches ${th}%<input type="range" min="20" max="90" step="5" data-b="admin.th" data-r data-num value="${th}"></label></div>
+    <div class="scroll"><table><tr><th>Day</th><th>Bookings</th><th>Guests</th><th>Room load</th><th>Staff needed at peak</th><th>Rostered</th><th></th></tr>
+    ${days.map(x=>`<tr><td>${fmtD(x.date)}</td><td>${x.n}</td><td>${x.guests}</td><td><div class="row" style="flex-wrap:nowrap"><div class="bar"><i style="width:${x.load}%"></i></div>${x.load}%</div></td><td>${x.peak}${x.peak?' at '+fmtT(x.peakT):''}</td><td>${x.rost}</td><td>${x.flag?'<span class="pill r">Peak day'+(x.gap?', '+x.gap+' extra':'')+'</span>':''}</td></tr>`).join('')}</table></div>
+    <p class="small muted">Staff needed counts operators per activity plus one usher per 15 guests. Rostered numbers are placeholders.</p></div>
+  <div class="panel stack"><div class="row sp"><h3>Booked revenue by activity</h3><span class="pill">Owners only</span></div>
+    ${Object.keys(rev).sort((a,b)=>rev[b]-rev[a]).map(k=>`<div class="row" style="flex-wrap:nowrap"><span style="width:150px;flex:none">${A[k].name}</span><div class="bar" style="flex:1"><i style="width:${100*rev[k]/mx}%;background:${A[k].c}"></i></div><span style="width:110px;flex:none" class="right">${money(rev[k])}</span></div>`).join('')}</div>
+  </div></section>`;
+}
+
+/* ---------- overlays ---------- */
+function vDrawer(){
+  const b=S.bookings.find(x=>x.id===S.drawer);if(!b)return '';
+  return `<div class="shade" data-a="close"><aside class="drawer stack" role="dialog" aria-label="Experience record">
+    <div class="row sp"><h2>${b.id}</h2><button class="btn ghost sm" data-a="close">Close</button></div>
+    <div>${pill(b)}</div>
+    <div class="sum"><div><span class="muted">Client</span><span>${esc(b.customer)}</span></div><div><span class="muted">Type</span><span>${b.type}</span></div><div><span class="muted">Source</span><span>${b.source}</span></div><div><span class="muted">Date</span><span>${fmtD(b.date)}</span></div><div><span class="muted">Guests</span><span>${b.guests.length} registered of ${b.headcount}</span></div></div>
+    ${b.note?'<p class="panel tint small">'+esc(b.note)+'</p>':''}
+    ${b.items.length?seqTable(b)+`<div class="sum"><div><span>Total</span><span>${money(total(b))}</span></div><div><span>Paid</span><span>${money(b.paid)}</span></div><div class="tot"><span>Balance due</span><span>${money(total(b)-b.paid)}</span></div></div>`:'<p class="muted">Nothing configured yet.</p>'}
+    <div class="row">
+      ${b.status==='Proposal Sent'?`<button class="btn grad" data-a="proposal" data-id="${b.id}">Open the customer proposal</button>`:''}
+      ${b.status==='Lead'||b.status==='Inquiry'?`<button class="btn" data-a="crFrom" data-id="${b.id}">Build this booking</button>`:''}
+      ${locked(b)?`<button class="btn" data-a="opOpen" data-id="${b.id}">Open guest list</button>`:''}
+      ${b.items.length?`<button class="btn ghost" data-a="go" data-v="cal" data-date="${b.date}">Show on calendar</button>`:''}
+    </div></aside></div>`;
+}
+function vProposal(){
+  const b=S.bookings.find(x=>x.id===S.proposal);if(!b)return '';
+  const tot=total(b),dep=Math.round(tot*DEPOSIT),bad=conflicted(b);
+  return `<div class="shade center" data-a="close"><div class="sheet stack" role="dialog" aria-label="Customer proposal">
+    <div class="row sp"><span class="mark" style="font-size:20px">W<span class="o"></span>W<small>ZONE</small></span><button class="btn ghost sm" data-a="close">Close</button></div>
+    <p class="small muted">This is the page the customer opens from the proposal link.</p>
+    <div><h2>Your event, ${esc(b.customer)}</h2><p class="muted">${fmtD(b.date)}, reference ${b.id}</p></div>
+    ${seqTable(b)}
+    <div class="sum"><div class="tot"><span>Total</span><span>${money(tot)}</span></div><div><span>Deposit to hold the slot</span><span>${money(dep)}</span></div></div>
+    <div><h3>Before you pay</h3><ul class="terms">${TERMS.map(t=>'<li>'+t+'</li>').join('')}</ul></div>
+    ${bad?'<p class="flag">This slot has just been taken by another booking. Our team will contact you with an alternative.</p>':`
+    <label class="row"><input type="checkbox" data-b="ack" data-r ${S.ack?'checked':''} style="width:20px;height:20px"> I read and acknowledge these terms</label>
+    <div class="row"><button class="btn grad" data-a="propPay" data-p="deposit" ${S.ack?'':'disabled'}>Pay deposit ${money(dep)}</button><button class="btn" data-a="propPay" data-p="full" ${S.ack?'':'disabled'}>Pay in full ${money(tot)}</button></div>
+    <p class="small muted">The slot is held only once payment is made.</p>`}
+  </div></div>`;
+}
+
+/* ---------- render + events ---------- */
+const VIEWS=[['web','Website'],['cr','CR console'],['cal','Calendar'],['op','Room operator'],['admin','Admin']];
+function render(){
+  document.getElementById('tabs').innerHTML=VIEWS.map((v,i)=>(i===1?'<span class="sep"></span>':'')+`<button data-a="go" data-v="${v[0]}" aria-current="${S.view===v[0]}">${v[1]}</button>`).join('');
+  document.getElementById('app').innerHTML=({web:vWeb,cr:vCR,cal:vCal,op:vOp,admin:vAdmin})[S.view]();
+  document.getElementById('over').innerHTML=S.proposal?vProposal():S.drawer?vDrawer():'';
+}
+function setPath(path,val){const k=path.split('.');let o=S;for(let i=0;i<k.length-1;i++)o=o[k[i]];o[k[k.length-1]]=val}
+function readEl(el){if(el.type==='checkbox')return el.checked;if(el.type==='number'||el.type==='range'||el.hasAttribute('data-num')){const v=parseInt(el.value,10);return isNaN(v)?1:Math.max(1,v)}return el.value}
+function refreshGates(){
+  const p=document.getElementById('payBtn');if(p){const s=webSlots().find(x=>x.t===S.web.time&&x.o);p.disabled=!(s&&S.web.name.trim()&&S.web.phone.trim())}
+  const s=document.getElementById('sendBtn');if(s){const pl=crPlan();s.disabled=!(pl.length&&pl.every(x=>x.ch)&&S.cr.customer.trim())}
+}
+document.addEventListener('input',e=>{const el=e.target.closest('[data-b]');if(!el)return;setPath(el.dataset.b,readEl(el));if(el.hasAttribute('data-k'))refreshGates()});
+document.addEventListener('change',e=>{const el=e.target.closest('[data-b]');if(!el)return;setPath(el.dataset.b,readEl(el));if(el.hasAttribute('data-r')){if(el.dataset.b==='web.date'||el.dataset.b==='web.n')S.web.time=null;render()}});
+document.addEventListener('submit',e=>{e.preventDefault();if(e.target.dataset.form==='ai'){S.web.ai=suggest(S.web.q||'6 friends');render()}});
+const ACT={
+  go(x){S.view=x.v;if(x.date)S.cal.date=x.date;S.drawer=S.proposal=null;window.scrollTo(0,0)},
+  close(x,e){if(e.target.closest('.drawer,.sheet')&&!e.target.closest('button'))return false;S.drawer=S.proposal=null},
+  open(x){S.drawer=x.id},
+  webMode(x){S.web.mode=x.m;S.web.room=null},
+  webRoom(x){S.web.room=x.r||null},
+  webPick(x){const w=S.web;w.act=x.k;if(x.n)w.n=+x.n;w.time=null;if(!A[x.k].self){w.step='inquiry';w.occ='Birthday'}else w.step='book';window.scrollTo(0,0)},
+  webInquiry(){S.web.act=null;S.web.step='inquiry';S.web.occ='';window.scrollTo(0,0)},
+  webReset(){Object.assign(S.web,{step:'browse',act:null,time:null,last:null})},
+  webTime(x){S.web.time=+x.t},
+  webPay(x){S.web.pay=x.p},
+  webConfirm(){const w=S.web,s=webSlots().find(q=>q.t===w.time&&q.o);if(!s)return;
+    const b=add({customer:w.name.trim(),type:w.n>1?'B2C group':'B2C individual',date:w.date,status:w.pay==='full'?'Confirmed':'Pre-Booked',headcount:w.n},[[w.act,w.n,s.o.rid,w.time]]);
+    w.last=b;w.step='done';toast('Paid. '+R[s.o.rid].name+' is locked for '+fmtT(w.time)+'.');window.scrollTo(0,0)},
+  sendInquiry(){const w=S.web;if(!w.co.trim()||!w.phone.trim()){toast('Add a name and a phone number so the team can reach you.');return false}
+    S.bookings.push({id:newId('WZ'),customer:w.co.trim(),type:w.act==='bday'?'B2C group':'B2B corporate',source:'Website',date:d(7),status:'Lead',items:[],paid:0,guests:[],headcount:w.n,note:[w.occ,w.n+' guests',w.dates].filter(Boolean).join(', ')});
+    Object.assign(w,{step:'browse',act:null,co:'',dates:'',occ:''});toast('Inquiry sent. It is now a lead in the CR console.')},
+  crTemplate(){const c=S.cr;c.items=[{act:'vr',n:20,room:null},{act:'bday',n:20,room:null},{act:'dance',n:30,room:null}];if(!c.customer)c.customer='Heba Lotfy';c.type='B2C group'},
+  crAdd(){S.cr.items.push({act:'karaoke',n:10,room:null})},
+  crDel(x){S.cr.items.splice(+x.i,1)},
+  crClear(){S.cr.items=[]},
+  crFrom(x){const b=S.bookings.find(q=>q.id===x.id);S.cr.customer=b.customer;S.cr.type=b.type;S.cr.items=[];S.cr.from=b.id;S.drawer=null;S.view='cr';toast('Client loaded. Add activities and send the proposal.')},
+  crSend(){const c=S.cr,pl=crPlan();if(!pl.every(p=>p.ch)||!c.customer.trim())return false;
+    if(c.from){const i=S.bookings.findIndex(q=>q.id===c.from);if(i>-1)S.bookings.splice(i,1);c.from=null}
+    const b=add({customer:c.customer.trim(),type:c.type,source:'CR',date:c.date,status:'Proposal Sent'},pl.map(p=>[p.act,p.n,p.ch.rid,p.start]));
+    c.items=[];c.customer='';S.ack=false;S.proposal=b.id;toast('Proposal '+b.id+' sent. It shows in yellow on the calendar.')},
+  proposal(x){S.drawer=null;S.ack=false;S.proposal=x.id},
+  propPay(x){const b=S.bookings.find(q=>q.id===S.proposal);if(!b||!S.ack||conflicted(b))return false;
+    b.status=x.p==='full'?'Confirmed':'Pre-Booked';b.paid=x.p==='full'?total(b):Math.round(total(b)*DEPOSIT);
+    const hit=S.bookings.filter(conflicted).length;S.proposal=null;S.view='cal';S.cal.date=b.date;
+    toast('Payment received. Slot locked and turned green.'+(hit?' '+hit+' competing proposal turned red.':''))},
+  calShift(x){S.cal.date=shift(S.cal.date,+x.n)},
+  opOpen(x){S.op.id=x.id;S.drawer=null;S.view='op'},
+  opAdd(){const b=S.bookings.find(q=>q.id===S.op.id)||S.bookings.find(locked),f=S.op.f;
+    if(!f.name.trim()||!f.phone.trim()||!f.age||!f.email.trim()){toast('Name, phone, age group and email are all required.');return false}
+    b.guests.push({name:f.name.trim(),phone:f.phone.trim(),age:f.age,email:f.email.trim(),in:true});S.op.f={name:'',phone:'',age:'',email:''};toast('Guest added and checked in.')},
+  opIn(x){const b=S.bookings.find(q=>q.id===S.op.id);b.guests[+x.i].in=true},
+  opExtra(){const b=S.bookings.find(q=>q.id===S.op.id)||S.bookings.find(locked),old=total(b);
+    for(const it of b.items){if(it.n!==b.headcount)continue;const a=A[it.act];if(!a.rounds&&it.n+1>a.rooms[it.room]){toast(R[it.room].name+' holds '+a.rooms[it.room]+' for '+a.name+'. Move the booking to a larger room first.');return false}}
+    b.items=b.items.map(it=>it.n===b.headcount?mkItem(it.act,it.n+1,it.room,it.start):it);b.headcount++;
+    toast('Booking is now '+b.headcount+' guests. Price up by '+money(total(b)-old)+', balance due '+money(total(b)-b.paid)+'.')}
+};
+document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(!el||el.disabled)return;if(ACT[el.dataset.a](el.dataset,e)!==false)render()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(S.drawer||S.proposal)){S.drawer=S.proposal=null;render()}});
+seed();render();
+</script>
+</body>
+</html>
